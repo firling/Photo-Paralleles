@@ -1,0 +1,152 @@
+# Photos Parallèles — production stack.
+#
+#   docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+#
+# Fixed project name so volume/container names are stable and never collide with
+# the dev database container `pp-dev-db` (different project, different network).
+name: photos-paralleles
+
+services:
+  # ─── App database ──────────────────────────────────────────────────────────
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ─── Migrations + seed (one-shot) ──────────────────────────────────────────
+  # Runs `prisma migrate deploy` then seeds the catalog + admin user, then exits.
+  # The app waits for it to complete successfully before starting.
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+      args:
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
+        NEXT_PUBLIC_UMAMI_SRC: ${NEXT_PUBLIC_UMAMI_SRC:-}
+        NEXT_PUBLIC_UMAMI_WEBSITE_ID: ${NEXT_PUBLIC_UMAMI_WEBSITE_ID:-}
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      UPLOADS_DIR: ${UPLOADS_DIR:-/app/uploads}
+    command: >
+      sh -c "pnpm exec prisma migrate deploy && pnpm db:seed"
+    restart: "no"
+
+  # ─── Next.js app ───────────────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+      args:
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
+        NEXT_PUBLIC_UMAMI_SRC: ${NEXT_PUBLIC_UMAMI_SRC:-}
+        NEXT_PUBLIC_UMAMI_WEBSITE_ID: ${NEXT_PUBLIC_UMAMI_WEBSITE_ID:-}
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      MAIL_FROM: ${MAIL_FROM:-}
+      MAIL_TO: ${MAIL_TO:-}
+      UPLOADS_DIR: ${UPLOADS_DIR:-/app/uploads}
+      ROOT_DOMAIN: ${ROOT_DOMAIN}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
+      NEXT_PUBLIC_UMAMI_SRC: ${NEXT_PUBLIC_UMAMI_SRC:-}
+      NEXT_PUBLIC_UMAMI_WEBSITE_ID: ${NEXT_PUBLIC_UMAMI_WEBSITE_ID:-}
+      # Back-office reads Umami stats over the internal network.
+      UMAMI_API_URL: ${UMAMI_API_URL:-http://umami:3000}
+      UMAMI_USERNAME: ${UMAMI_USERNAME:-admin}
+      UMAMI_PASSWORD: ${UMAMI_PASSWORD:-umami}
+      # Falls back to NEXT_PUBLIC_UMAMI_WEBSITE_ID when empty.
+      UMAMI_WEBSITE_ID: ${UMAMI_WEBSITE_ID:-}
+    volumes:
+      - uploads:/app/uploads
+    # Publish a host port so the app is reachable without Traefik (local smoke
+    # test). Behind Traefik in real prod this is optional; the Traefik labels
+    # below are what route public traffic.
+    ports:
+      - "${APP_HOST_PORT:-3000}:3000"
+    networks:
+      - default
+      - traefik-net
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-net
+      - "traefik.http.routers.photos-paralleles.rule=Host(`${ROOT_DOMAIN}`)"
+      - traefik.http.routers.photos-paralleles.entrypoints=websecure
+      - traefik.http.routers.photos-paralleles.tls=true
+      - traefik.http.routers.photos-paralleles.tls.certresolver=${CERT_RESOLVER:-letsencrypt}
+      - traefik.http.services.photos-paralleles.loadbalancer.server.port=3000
+    restart: always
+
+  # ─── Analytics: Umami (cookieless, no consent banner) ──────────────────────
+  umami-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: umami
+      POSTGRES_USER: umami
+      POSTGRES_PASSWORD: ${UMAMI_DB_PASSWORD}
+    volumes:
+      - umami-pgdata:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U umami -d umami"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    depends_on:
+      umami-db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://umami:${UMAMI_DB_PASSWORD}@umami-db:5432/umami
+      DATABASE_TYPE: postgresql
+      APP_SECRET: ${UMAMI_APP_SECRET}
+    networks:
+      - default
+      - traefik-net
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-net
+      # Umami on its own subdomain (the official image cannot serve a sub-path
+      # at runtime). Same TLS resolver as the app.
+      - "traefik.http.routers.photos-paralleles-umami.rule=Host(`analytics.${ROOT_DOMAIN}`)"
+      - traefik.http.routers.photos-paralleles-umami.entrypoints=websecure
+      - traefik.http.routers.photos-paralleles-umami.tls=true
+      - traefik.http.routers.photos-paralleles-umami.tls.certresolver=${CERT_RESOLVER:-letsencrypt}
+      - traefik.http.services.photos-paralleles-umami.loadbalancer.server.port=3000
+    restart: always
+
+networks:
+  # Provided by the host's Traefik stack. Create once: `docker network create traefik-net`.
+  traefik-net:
+    external: true
+
+volumes:
+  pgdata:
+  uploads:
+  umami-pgdata:

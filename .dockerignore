@@ -1,0 +1,29 @@
+# Build context hygiene — keep host artifacts out of the image build.
+node_modules
+.next
+out
+build
+
+# Secrets & local env (never bake into the image)
+.env
+.env.*
+!.env.production.example
+
+# VCS / tooling
+.git
+.gitignore
+.claude
+tasks
+
+# Local backups & scratch
+backup
+*.log
+
+# Docs / design assets not needed at build time
+design-bundle
+assets
+spec.md
+README.md
+DEPLOY.md
+*.pdf
+TESTS*.pdf

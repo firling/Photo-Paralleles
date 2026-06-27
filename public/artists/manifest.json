@@ -1,0 +1,85 @@
+{
+  "source": "instagram.com/photosparalleles",
+  "artists": [
+    {
+      "slug": "giorgia-vlassich",
+      "name": "Giorgia Vlassich",
+      "book": "À travers",
+      "origin": "Italie–Croatie",
+      "city": "Fermo",
+      "portrait": "/artists/giorgia-vlassich/portrait.jpg",
+      "oeuvre": "/artists/giorgia-vlassich/oeuvre.jpg",
+      "cover": "/artists/giorgia-vlassich/cover.jpg"
+    },
+    {
+      "slug": "francois-xavier-seren",
+      "name": "François-Xavier Seren",
+      "book": "La Comédie humaine",
+      "origin": "France",
+      "city": "Paris",
+      "portrait": "/artists/francois-xavier-seren/portrait.jpg",
+      "oeuvre": "/artists/francois-xavier-seren/oeuvre.jpg",
+      "cover": "/artists/francois-xavier-seren/cover.jpg"
+    },
+    {
+      "slug": "ullic-morard",
+      "name": "Ullic Morard",
+      "book": "Aria",
+      "origin": "Italie–France",
+      "city": "Annecy",
+      "portrait": "/artists/ullic-morard/portrait.jpg",
+      "oeuvre": "/artists/ullic-morard/oeuvre.jpg",
+      "cover": "/artists/ullic-morard/cover.jpg"
+    },
+    {
+      "slug": "jean-matthieu-gosselin",
+      "name": "Jean-Matthieu Gosselin",
+      "book": "Working on a Dream",
+      "origin": "France",
+      "city": "Barcelone",
+      "portrait": "/artists/jean-matthieu-gosselin/portrait.jpg",
+      "oeuvre": "/artists/jean-matthieu-gosselin/oeuvre.jpg",
+      "cover": "/artists/jean-matthieu-gosselin/cover.jpg"
+    },
+    {
+      "slug": "maeva-benaiche",
+      "name": "Maëva Benaiche",
+      "book": "Magma",
+      "origin": "France",
+      "city": "Toulouse",
+      "portrait": "/artists/maeva-benaiche/portrait.jpg",
+      "oeuvre": "/artists/maeva-benaiche/oeuvre.jpg",
+      "cover": "/artists/maeva-benaiche/cover.jpg"
+    },
+    {
+      "slug": "rafa-badia",
+      "name": "Rafa Badía",
+      "book": "Barcelona Riff",
+      "origin": "Espagne",
+      "city": "Barcelone",
+      "portrait": "/artists/rafa-badia/portrait.jpg",
+      "oeuvre": "/artists/rafa-badia/oeuvre.jpg",
+      "cover": "/artists/rafa-badia/cover.jpg"
+    },
+    {
+      "slug": "claire-amaouche",
+      "name": "Claire Amaouche",
+      "book": "De tous les chemins sauvages",
+      "origin": "France",
+      "city": "Berlin",
+      "portrait": "/artists/claire-amaouche/portrait.jpg",
+      "oeuvre": "/artists/claire-amaouche/oeuvre.jpg",
+      "cover": "/artists/claire-amaouche/cover.jpg"
+    },
+    {
+      "slug": "dominique-agius",
+      "name": "Dominique Agius",
+      "book": "ID-ENTITY",
+      "origin": "France",
+      "city": "Nice",
+      "portrait": "/artists/dominique-agius/portrait.jpg",
+      "oeuvre": "/artists/dominique-agius/oeuvre.jpg",
+      "cover": "/artists/dominique-agius/cover.jpg"
+    }
+  ]
+}

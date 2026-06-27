@@ -1,0 +1,112 @@
+// Photos Parallèles — data layer.
+// Money is stored in cents (Int). The public catalog (Artist/Book/SiteSetting)
+// is seeded from the canonical content; Order/OrderItem/AdminUser back later
+// increments (cart, checkout, back-office).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Availability {
+  AVAILABLE
+  SOLD_OUT
+  COMING_SOON
+}
+
+enum OrderStatus {
+  EN_ATTENTE
+  PAYEE
+  EXPEDIEE
+  LIVREE
+  ANNULEE
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Artist {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  name          String
+  role          String
+  originCountry String
+  baseCity      String
+  lead          String
+  bio           Json
+  portrait      String
+  oeuvre        String
+  order         Int      @default(0)
+  published     Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  book Book?
+}
+
+model Book {
+  id           String       @id @default(cuid())
+  slug         String       @unique
+  title        String
+  priceCents   Int
+  currency     String       @default("EUR")
+  availability Availability @default(AVAILABLE)
+  cover        String
+  specs        Json
+  description  Json
+  order        Int          @default(0)
+  published    Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  artistId String @unique
+  artist   Artist @relation(fields: [artistId], references: [id])
+}
+
+model SiteSetting {
+  id               String   @id @default("singleton")
+  shippingFlatCents Int     @default(600)
+  currency         String   @default("EUR")
+  contactEmail     String?
+  instagramUrl     String?
+  showBoxset       Boolean  @default(true)
+  boxsetPriceCents Int      @default(13000)
+  updatedAt        DateTime @updatedAt
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  reference       String      @unique
+  status          OrderStatus @default(EN_ATTENTE)
+  customerName    String
+  customerEmail   String
+  shippingAddress Json
+  subtotalCents   Int
+  shippingCents   Int
+  totalCents      Int
+  paymentProvider String?
+  paymentRef      String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  items OrderItem[]
+}
+
+model OrderItem {
+  id            String @id @default(cuid())
+  orderId       String
+  order         Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  bookId        String?
+  bookSlug      String
+  title         String
+  unitPriceCents Int
+  quantity      Int
+}
