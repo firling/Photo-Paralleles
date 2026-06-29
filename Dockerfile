@@ -61,8 +61,10 @@ RUN pnpm exec next build
 
 # ─── runner : minimal final image ───────────────────────────────────────────
 FROM ${NODE_IMAGE} AS runner
+# No curl/wget in the runtime image: keeps the attack surface minimal so a
+# compromised process can't pull a second-stage payload. Healthcheck uses Node.
 RUN apt-get update \
- && apt-get install -y --no-install-recommends openssl ca-certificates curl \
+ && apt-get install -y --no-install-recommends openssl ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 ENV NODE_ENV=production
@@ -87,6 +89,6 @@ USER nextjs
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=25s --retries=3 \
-  CMD curl -fsS http://127.0.0.1:3000/ > /dev/null || exit 1
+  CMD node -e "require('http').get('http://127.0.0.1:3000/',r=>process.exit(r.statusCode<500?0:1)).on('error',()=>process.exit(1))"
 
 CMD ["node", "server.js"]

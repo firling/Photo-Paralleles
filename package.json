@@ -36,7 +36,7 @@
     "@tiptap/react": "^2.27.2",
     "@tiptap/starter-kit": "^2.27.2",
     "jose": "^6.2.3",
-    "next": "15.3.4",
+    "next": "15.3.8",
     "pg": "^8.22.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
