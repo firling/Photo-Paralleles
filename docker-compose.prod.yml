@@ -23,31 +23,9 @@ services:
       timeout: 3s
       retries: 5
 
-  # ─── Migrations + seed (one-shot) ──────────────────────────────────────────
-  # Runs `prisma migrate deploy` then seeds the catalog + admin user, then exits.
-  # The app waits for it to complete successfully before starting.
-  migrate:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: builder
-      args:
-        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
-        NEXT_PUBLIC_UMAMI_SRC: ${NEXT_PUBLIC_UMAMI_SRC:-}
-        NEXT_PUBLIC_UMAMI_WEBSITE_ID: ${NEXT_PUBLIC_UMAMI_WEBSITE_ID:-}
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-      ADMIN_EMAIL: ${ADMIN_EMAIL}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
-      UPLOADS_DIR: ${UPLOADS_DIR:-/app/uploads}
-    command: >
-      sh -c "pnpm exec prisma migrate deploy && pnpm db:seed"
-    restart: "no"
-
   # ─── Next.js app ───────────────────────────────────────────────────────────
+  # Migrations + seed now run inside the app image at startup (see docker-entrypoint.sh),
+  # so a single deployable image is enough — no separate one-shot `migrate` service.
   app:
     build:
       context: .
@@ -60,8 +38,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      migrate:
-        condition: service_completed_successfully
     environment:
       DATABASE_URL: ${DATABASE_URL}
       JWT_SECRET: ${JWT_SECRET}

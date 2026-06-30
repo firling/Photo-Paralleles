@@ -55,11 +55,10 @@ COPY . .
 RUN pnpm exec prisma generate
 RUN pnpm exec next build
 
-# `builder` doubles as the target for the one-shot `migrate` service
-# (prisma migrate deploy + seed): it has the full node_modules, the prisma CLI,
-# tsx and @node-rs/argon2.
+# `builder` holds the full toolchain (prisma CLI, tsx, @node-rs/argon2, app source)
+# reused by the runner to migrate + seed at startup.
 
-# ─── runner : minimal final image ───────────────────────────────────────────
+# ─── runner : final image (standalone server + startup migrate/seed) ─────────
 FROM ${NODE_IMAGE} AS runner
 # No curl/wget in the runtime image: keeps the attack surface minimal so a
 # compromised process can't pull a second-stage payload. Healthcheck uses Node.
@@ -81,6 +80,20 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Startup migrate + seed (single-image deploy: no separate `migrate` service). The
+# seed runs through tsx and imports app source (lib/*), and pnpm's node_modules
+# layout makes cherry-picking the prisma CLI unsafe — so bring the builder's full
+# node_modules and the sources the seed needs. This overrides the standalone's
+# pruned node_modules with the complete one (server.js runs fine against it).
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/lib ./lib
+COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+COPY --from=builder --chown=nextjs:nodejs /app/tsconfig.json ./tsconfig.json
+COPY --chown=nextjs:nodejs docker-entrypoint.sh ./docker-entrypoint.sh
+RUN chmod +x docker-entrypoint.sh
+
 # Uploads volume (future back-office image pipeline).
 RUN mkdir -p /app/uploads && chown -R nextjs:nodejs /app/uploads
 VOLUME ["/app/uploads"]
@@ -91,4 +104,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=25s --retries=3 \
   CMD node -e "require('http').get('http://127.0.0.1:3000/',r=>process.exit(r.statusCode<500?0:1)).on('error',()=>process.exit(1))"
 
+ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["node", "server.js"]
