@@ -166,6 +166,8 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 400; line-height: 1.05; mar
 .fcol a { display:block; padding:6px 0; color:#CFC9C0; font-size: var(--step--1); letter-spacing:.04em; }
 .fcol a:hover { color:#fff; }
 .footer-base { border-top:1px solid #2C2A28; margin-top: clamp(40px,5vw,64px); padding-top: 24px; display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap; color:#7E776D; font-size: var(--step--1); letter-spacing:.05em; }
+.footer-base a { color:#CFC9C0; border-bottom:1px solid #3A3835; }
+.footer-base a:hover { color:#fff; }
 
 /* ---- Generic page header ---- */
 .page-head { padding-block: clamp(56px,7vw,104px) clamp(28px,3vw,44px); }

@@ -33,6 +33,16 @@ export default function Footer() {
         </div>
         <div className="footer-base">
           <span>© 2026 Photos Parallèles</span>
+          <span>
+            Site réalisé par{" "}
+            <a
+              href="https://julien.anquetil.org"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Julien Anquetil
+            </a>
+          </span>
           <span>Annecy · France</span>
         </div>
       </div>
