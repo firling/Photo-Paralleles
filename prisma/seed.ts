@@ -1,11 +1,25 @@
 import { PrismaClient, Prisma } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { hash } from "@node-rs/argon2";
-import { artists, books } from "./seed-data";
+import { artists, books, projects } from "./seed-data";
 import { paragraphsToDoc } from "../lib/richtext";
 
 function asJson(value: unknown): Prisma.InputJsonValue {
   return value as Prisma.InputJsonValue;
+}
+
+/**
+ * Inside-the-book gallery shown on the book detail page: the editorial title
+ * card followed by the three double-page spreads (files under
+ * `public/books/<slug>/`).
+ */
+function bookGallery(slug: string): Prisma.InputJsonValue {
+  return [
+    `/books/${slug}/card.jpg`,
+    `/books/${slug}/spread-1.jpg`,
+    `/books/${slug}/spread-2.jpg`,
+    `/books/${slug}/spread-3.jpg`,
+  ];
 }
 
 /**
@@ -72,6 +86,7 @@ async function seedBooks(artistIdBySlug: Map<string, string>): Promise<void> {
       );
     }
     const specs = asJson(book.specs);
+    const gallery = bookGallery(book.slug);
     await prisma.book.upsert({
       where: { slug: book.slug },
       create: {
@@ -81,6 +96,7 @@ async function seedBooks(artistIdBySlug: Map<string, string>): Promise<void> {
         currency: book.currency,
         availability: book.availability,
         cover: book.cover,
+        gallery,
         specs,
         description: asJson(paragraphsToDoc(book.description)),
         order: index,
@@ -92,11 +108,33 @@ async function seedBooks(artistIdBySlug: Map<string, string>): Promise<void> {
         currency: book.currency,
         availability: book.availability,
         cover: book.cover,
+        gallery,
         specs,
         description: asJson(paragraphsToDoc(book.description)),
         order: index,
         artistId,
       },
+    });
+  }
+}
+
+async function seedProjects(): Promise<void> {
+  for (const [index, project] of projects.entries()) {
+    const data = {
+      title: project.title,
+      kind: project.kind,
+      year: project.year,
+      location: project.location,
+      lead: project.lead,
+      description: asJson(paragraphsToDoc(project.description)),
+      cover: project.cover,
+      gallery: asJson(project.gallery),
+      order: index,
+    };
+    await prisma.project.upsert({
+      where: { slug: project.slug },
+      create: { slug: project.slug, ...data },
+      update: data,
     });
   }
 }
@@ -134,19 +172,23 @@ async function seedAdmin(): Promise<boolean> {
 async function main(): Promise<void> {
   const artistIdBySlug = await seedArtists();
   await seedBooks(artistIdBySlug);
+  await seedProjects();
   await seedSettings();
   const adminSeeded = await seedAdmin();
 
-  const [artistCount, bookCount, settingsCount, adminCount] = await Promise.all([
-    prisma.artist.count(),
-    prisma.book.count(),
-    prisma.siteSetting.count(),
-    prisma.adminUser.count(),
-  ]);
+  const [artistCount, bookCount, projectCount, settingsCount, adminCount] =
+    await Promise.all([
+      prisma.artist.count(),
+      prisma.book.count(),
+      prisma.project.count(),
+      prisma.siteSetting.count(),
+      prisma.adminUser.count(),
+    ]);
 
   console.log("\n✅ Seed complete:");
   console.log(`   • Artists:  ${artistCount}`);
   console.log(`   • Books:    ${bookCount}`);
+  console.log(`   • Projects: ${projectCount}`);
   console.log(`   • Settings: ${settingsCount}`);
   console.log(`   • Admins:   ${adminCount}${adminSeeded ? "" : " (skipped)"}`);
 }

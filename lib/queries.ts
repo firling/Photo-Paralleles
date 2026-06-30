@@ -15,10 +15,18 @@ import type {
   Book,
   BookSpecs,
   Currency,
+  Project,
 } from "@/lib/content";
 
 type BookWithArtist = Prisma.BookGetPayload<{ include: { artist: true } }>;
 type ArtistWithBook = Prisma.ArtistGetPayload<{ include: { book: true } }>;
+type ProjectRow = Prisma.ProjectGetPayload<object>;
+
+/** Coerce a stored `Json` image list into a clean `string[]`. */
+function toImageList(value: Prisma.JsonValue): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((v): v is string => typeof v === "string");
+}
 
 export interface SiteSettings {
   shippingFlatCents: number;
@@ -48,8 +56,23 @@ function mapBook(row: BookWithArtist): Book {
     currency: row.currency as Currency,
     availability: row.availability as Availability,
     cover: row.cover,
+    gallery: toImageList(row.gallery),
     specs: row.specs as unknown as BookSpecs,
     descriptionHtml: renderRichText(row.description),
+  };
+}
+
+function mapProject(row: ProjectRow): Project {
+  return {
+    slug: row.slug,
+    title: row.title,
+    kind: row.kind,
+    year: row.year,
+    location: row.location,
+    lead: row.lead,
+    descriptionHtml: renderRichText(row.description),
+    cover: row.cover,
+    gallery: toImageList(row.gallery),
   };
 }
 
@@ -114,6 +137,21 @@ export async function getBookByArtist(
 
 export async function getArtistOfBook(book: Book): Promise<Artist | null> {
   return getArtist(book.artistSlug);
+}
+
+export async function getProjects(): Promise<Project[]> {
+  const rows = await prisma.project.findMany({
+    where: { published: true },
+    orderBy: { order: "asc" },
+  });
+  return rows.map(mapProject);
+}
+
+export async function getProject(slug: string): Promise<Project | null> {
+  const row = await prisma.project.findFirst({
+    where: { slug, published: true },
+  });
+  return row ? mapProject(row) : null;
 }
 
 export async function getSettings(): Promise<SiteSettings> {

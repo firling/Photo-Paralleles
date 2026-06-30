@@ -1,8 +1,9 @@
 import Link from "next/link";
 import BookCard from "@/components/BookCard";
 import ArtistCard from "@/components/ArtistCard";
+import ProjectCard from "@/components/ProjectCard";
 import { collection } from "@/lib/content";
-import { getArtist, getArtists, getBooks } from "@/lib/queries";
+import { getArtist, getArtists, getBooks, getProjects } from "@/lib/queries";
 
 // Catalog is DB-backed and editable from the back-office → render dynamically
 // so edits appear instantly and the build never requires the database.
@@ -11,12 +12,14 @@ export const dynamic = "force-dynamic";
 const HERO_ARTIST_SLUG = "francois-xavier-seren";
 
 export default async function HomePage() {
-  const [heroArtist, books, artists] = await Promise.all([
+  const [heroArtist, books, artists, projects] = await Promise.all([
     getArtist(HERO_ARTIST_SLUG),
     getBooks(),
     getArtists(),
+    getProjects(),
   ]);
   const teaserBooks = books.slice(0, 4);
+  const teaserProjects = projects.slice(0, 2);
 
   return (
     <>
@@ -38,8 +41,8 @@ export default async function HomePage() {
             <Link className="btn" href="/livres">
               Découvrir la collection
             </Link>
-            <Link className="btn btn--ghost" href="/artistes">
-              Les artistes
+            <Link className="btn btn--ghost" href="/projets">
+              Nos projets
             </Link>
           </div>
         </div>
@@ -92,7 +95,7 @@ export default async function HomePage() {
               Photographes, artistes et créateurs réunis autour d&apos;une même
               passion pour la narration visuelle.
             </p>
-            <Link href="/artistes">Tous les artistes</Link>
+            <Link href="/livres">Découvrir leurs livres</Link>
           </div>
 
           <div className="artists artists--mini">
@@ -102,6 +105,29 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* PROJECTS */}
+      {teaserProjects.length > 0 && (
+        <section className="wrap section">
+          <div className="section-head">
+            <div>
+              <p className="label eyebrow">Ce que nous faisons</p>
+              <h2 style={{ marginTop: 14 }}>Nos projets</h2>
+            </div>
+            <p>
+              Expositions, éditions et rencontres — l&apos;association fait
+              dialoguer les images au-delà du livre.
+            </p>
+            <Link href="/projets">Tous les projets</Link>
+          </div>
+
+          <div className="projects">
+            {teaserProjects.map((project) => (
+              <ProjectCard key={project.slug} project={project} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* MANIFESTO */}
       <section className="wrap section" style={{ textAlign: "center" }}>

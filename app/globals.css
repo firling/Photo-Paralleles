@@ -7,7 +7,7 @@
    Direction: Galerie minimaliste / éditorial littéraire
    Ported verbatim from design-bundle/styles.css.
    Fonts are wired to the next/font CSS variables
-   (--font-fraunces / --font-jost) injected on <html>.
+   (--font-display = Space Grotesk / --font-body = Inter) injected on <html>.
    ============================================================ */
 
 :root {
@@ -19,8 +19,11 @@
   --muted:   #8A847C;
   --accent:  #9C3B2E;
 
-  --serif: var(--font-fraunces), "Playfair Display", Georgia, serif;
-  --sans:  var(--font-jost), "Inter", system-ui, sans-serif;
+  /* Contemporary editorial pairing. `--serif` keeps its name for backward
+     compatibility but now maps to the Space Grotesk display face; `--sans` maps
+     to Inter for body copy. */
+  --serif: var(--font-display), "Space Grotesk", system-ui, sans-serif;
+  --sans:  var(--font-body), "Inter", system-ui, sans-serif;
 
   --maxw: 1280px;
   --gutter: clamp(20px, 5vw, 64px);
@@ -196,6 +199,46 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 400; line-height: 1.05; mar
 .note { font-size: var(--step--1); color: var(--muted); margin-top: 10px; }
 .tag-avail { display:inline-flex; align-items:center; gap:.5em; font-size: var(--step--1); letter-spacing:.14em; text-transform:uppercase; color:var(--accent); }
 .tag-avail::before { content:""; width:7px; height:7px; border-radius:999px; background:var(--accent); }
+
+/* ---- Book gallery (title card + inside spreads) ---- */
+.book-gallery { margin-top: clamp(48px,7vw,96px); }
+.book-gallery__grid { display:grid; grid-template-columns: repeat(2,1fr); gap: clamp(14px,2vw,28px); }
+.book-gallery__item { margin:0; overflow:hidden; border:1px solid var(--line); background:var(--paper-2); }
+.book-gallery__item img { width:100%; height:100%; object-fit:cover; transition: transform .6s ease; }
+.book-gallery__item:hover img { transform: scale(1.02); }
+.book-gallery__item--lead { grid-column: 1 / -1; }
+
+/* ---- Author block on the book detail page ---- */
+.book-author { margin-top: clamp(56px,8vw,110px); }
+
+/* ---- Projects (grid + detail) ---- */
+.projects { display:grid; grid-template-columns: repeat(2,1fr); gap: clamp(22px,3vw,48px) clamp(18px,2.4vw,34px); }
+.project-card { display:flex; flex-direction:column; }
+.project-card__media { position:relative; aspect-ratio: 3/2; overflow:hidden; background:var(--paper-2); border:1px solid var(--line); }
+.project-card__media img { width:100%; height:100%; object-fit:cover; transition: transform .6s ease; }
+.project-card:hover .project-card__media img { transform: scale(1.03); }
+.project-card__kind { position:absolute; top:12px; left:12px; background:var(--paper); border:1px solid var(--line); font-size:11px; letter-spacing:.14em; text-transform:uppercase; padding:5px 9px; color:var(--ink-soft); }
+.project-card__title { font-family:var(--serif); font-size: var(--step-2); margin-top: 18px; line-height:1.1; }
+.project-card__meta { color: var(--muted); font-size: var(--step--1); margin-top: 8px; letter-spacing:.04em; text-transform:uppercase; }
+.project-card__lead { color: var(--ink-soft); margin-top: 12px; max-width: 48ch; }
+
+.project-hero { margin-bottom: clamp(28px,4vw,52px); }
+.project-hero img { width:100%; max-height: 72vh; object-fit:cover; border:1px solid var(--line); }
+.project-meta { display:flex; flex-wrap:wrap; gap: 10px 28px; margin: 18px 0 0; padding:0; list-style:none; color:var(--muted); font-size:var(--step--1); text-transform:uppercase; letter-spacing:.12em; }
+.project-meta li strong { color: var(--ink); font-weight:500; }
+.project-body { max-width: 64ch; }
+.project-gallery { display:grid; grid-template-columns: repeat(2,1fr); gap: clamp(14px,2vw,28px); margin-top: clamp(40px,6vw,80px); }
+.project-gallery figure { margin:0; overflow:hidden; border:1px solid var(--line); background:var(--paper-2); }
+.project-gallery img { width:100%; height:100%; object-fit:cover; transition: transform .6s ease; }
+.project-gallery figure:hover img { transform: scale(1.02); }
+.project-gallery figure:nth-child(3n+1) { grid-column: 1 / -1; aspect-ratio: 16/9; }
+
+@media (max-width: 700px) {
+  .book-gallery__grid { grid-template-columns: 1fr; }
+  .projects { grid-template-columns: 1fr; }
+  .project-gallery { grid-template-columns: 1fr; }
+  .project-gallery figure:nth-child(3n+1) { aspect-ratio: 3/2; }
+}
 
 /* ---- Foundations / styleguide ---- */
 .swatches { display:grid; grid-template-columns: repeat(6,1fr); gap:16px; }

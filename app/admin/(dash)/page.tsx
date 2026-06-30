@@ -11,10 +11,11 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const [bookCount, artistCount, orderCount, statusGroups, latestOrders] =
+  const [bookCount, artistCount, projectCount, orderCount, statusGroups, latestOrders] =
     await Promise.all([
       prisma.book.count(),
       prisma.artist.count(),
+      prisma.project.count(),
       prisma.order.count(),
       prisma.order.groupBy({ by: ["status"], _count: { _all: true } }),
       prisma.order.findMany({
@@ -46,6 +47,11 @@ export default async function DashboardPage() {
           <span className="adm-kpi__label">Artistes</span>
           <div className="adm-kpi__value">{artistCount}</div>
           <div className="adm-kpi__hint">publiés et brouillons</div>
+        </div>
+        <div className="adm-card">
+          <span className="adm-kpi__label">Projets</span>
+          <div className="adm-kpi__value">{projectCount}</div>
+          <div className="adm-kpi__hint">expositions, éditions…</div>
         </div>
         <div className="adm-card">
           <span className="adm-kpi__label">Commandes</span>

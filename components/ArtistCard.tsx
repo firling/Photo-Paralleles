@@ -14,9 +14,11 @@ export default async function ArtistCard({
   variant?: "full" | "mini";
 }) {
   const book = await getBookByArtist(artist.slug);
+  // Artists are presented inside their book page now; link there.
+  const href = book ? `/livres/${book.slug}#auteur` : "/livres";
 
   return (
-    <Link className="artist" href={`/artistes/${artist.slug}`}>
+    <Link className="artist" href={href}>
       <div className="artist__photo">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={artist.portrait} alt={artist.name} />

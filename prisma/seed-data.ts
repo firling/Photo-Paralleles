@@ -37,6 +37,18 @@ export interface SeedBook {
   description: string[];
 }
 
+export interface SeedProject {
+  slug: string;
+  title: string;
+  kind: string;
+  year: string;
+  location: string;
+  lead: string;
+  description: string[];
+  cover: string;
+  gallery: string[];
+}
+
 /** Specs shared by every title of the collection (spec.md §7). */
 const COLLECTION_SPECS: BookSpecs = {
   format: "Poche · 105 × 152 mm",
@@ -278,5 +290,87 @@ export const books: SeedBook[] = [
     cover: "/artists/dominique-agius/oeuvre.jpg",
     specs: COLLECTION_SPECS,
     description: placeholderDescription("ID-ENTITY", "Dominique Agius"),
+  },
+];
+
+/**
+ * Projects carried by the association — exhibitions and editions.
+ * Texts are sourced from the client documents (« La mémoire perdue » exhibition
+ * statement, the Arles 2023 / La Muleta booklet, and the collection blurb).
+ * Images live under `public/projects/<slug>/`.
+ */
+const ANDORRE = "/projects/la-memoire-perdue";
+const ARLES = "/projects/arles-2023";
+const ROTARY = "/projects/rotary-art-barcelone";
+const BOOK_CARDS = [
+  "/books/working-on-a-dream/card.jpg",
+  "/books/de-tous-les-chemins-sauvages/card.jpg",
+  "/books/id-entity/card.jpg",
+  "/books/la-comedie-humaine/card.jpg",
+  "/books/a-travers/card.jpg",
+  "/books/magma/card.jpg",
+  "/books/barcelona-riff/card.jpg",
+  "/books/aria/card.jpg",
+];
+
+export const projects: SeedProject[] = [
+  {
+    slug: "la-memoire-perdue",
+    title: "La mémoire perdue",
+    kind: "Exposition",
+    year: "2025",
+    location: "Biennale internationale d'Andorre — LANDART'25",
+    lead: "« Pausa para continuar » — une réflexion visuelle à quatre mains de Jean-Matthieu Gosselin et Ullic Morard sur la mémoire individuelle perdue et la mémoire collective à reconstruire.",
+    description: [
+      "« La mémoire perdue » est un silence à 4 temps. L'amnésie s'accroche à très peu de choses, comme la pause dans la musique : les silences ne sont attachés à rien — contrairement aux notes — comme le sont l'absence, l'oubli, le silence. L'œuvre de Jean-Matthieu Gosselin et Ullic Morard propose un voyage au cœur d'une mémoire abîmée, ébréchée, avec de petits stigmates et des cicatrices fugaces.",
+      "Dans ces images mixtes entre deux photographes, la pause est longue, douloureuse, elliptique, mais elle permet néanmoins de célébrer et de commémorer des morceaux de vie. Ce travail partagé est un voyage à travers des ressources intimes, un recueil d'expériences, une réflexion sur la mémoire, qu'elle existe ou non.",
+      "Ils proposent des images suspendues dans l'air, en mouvement, qui se parlent — pour faire une pause, plusieurs pauses selon le point de vue du visiteur — pour réfléchir à ce que sont les récits, ce qui est plausible, ce qui est vrai, ce qu'est la poésie, l'amnésie, l'oubli, la reconstruction du passé. D'où naît le Souffle, et le pouvoir du but.",
+      "« L'art est une pause, une rencontre de sensibilités. » — Doménico Cieri Estrada.",
+    ],
+    cover: `${ANDORRE}/cover.jpg`,
+    gallery: Array.from({ length: 9 }, (_, i) => `${ANDORRE}/g${i + 1}.jpg`),
+  },
+  {
+    slug: "arles-2023",
+    title: "Arles 2023 — La Muleta",
+    kind: "Exposition",
+    year: "2023",
+    location: "Les Rencontres de la photographie d'Arles",
+    lead: "Deux installations présentées par Photos Parallèles aux Rencontres d'Arles : « Memorial Drive » de Jean-Matthieu Gosselin et « Tesseract » d'Ullic Morard.",
+    description: [
+      "Jean-Matthieu Gosselin, dans « Memorial Drive », propose une insurrection de la mémoire contre l'absence et la perte ; il voyage dans des souvenirs totalement disparus et compose des autoportraits en quête d'une identité effacée.",
+      "Ullic Morard offre, avec « Tesseract », une méditation sur le temps des ruines magiques — un dialogue entre la temporalité et les images créées — et dresse un mémorial des étoiles filantes du souvenir.",
+      "L'art, et donc la photographie, a le pouvoir d'influencer le monde et de « changer la vie », comme l'écrivait Arthur Rimbaud. Les deux photographes croient en la capacité des créateurs à agir sur le monde où ils vivent : leurs photographies cherchent à unir l'utopie, la mémoire, la création et la transmission.",
+    ],
+    cover: `${ARLES}/cover.jpg`,
+    gallery: Array.from({ length: 5 }, (_, i) => `${ARLES}/g${i + 1}.jpg`),
+  },
+  {
+    slug: "rotary-art-barcelone",
+    title: "Lumières de mémoire — Barcelone",
+    kind: "Exposition",
+    year: "2026",
+    location: "Rotary'Art",
+    lead: "Une série de Jean-Matthieu Gosselin sur Barcelone : reflets, lumières et fragments d'une ville parcourue comme un territoire de mémoire.",
+    description: [
+      "De « Sous la fenêtre » à « Lumières de mémoire », Jean-Matthieu Gosselin arpente Barcelone et en capte la poésie discrète : la puissance du bleu d'un bassin, un jardin de rêve, la culture urbaine, les reflets architecturaux et les grues qui s'aiment d'amour tendre.",
+      "Chaque image prolonge la recherche de l'auteur sur le souvenir et la reconstruction de soi — la ville devient un espace où la lumière révèle ce que la mémoire peine parfois à retenir.",
+    ],
+    cover: `${ROTARY}/cover.jpg`,
+    gallery: Array.from({ length: 8 }, (_, i) => `${ROTARY}/g${i + 1}.jpg`),
+  },
+  {
+    slug: "le-souffle-de-l-image",
+    title: "Le Souffle de l'Image",
+    kind: "Édition",
+    year: "2026",
+    location: "Festival d'Arles, puis Annecy, Barcelone, Paris",
+    lead: "La collection éditoriale de l'association : huit photobooks au format poche, une identité visuelle commune et la pleine liberté de chaque auteur.",
+    description: [
+      "« Le Souffle de l'Image » réunit huit photographes au format poche (105 × 152 mm), 32 pages, couverture souple. Une même collection, huit univers : la photographie documentaire y côtoie la photographie d'auteur, dans un dialogue ouvert entre les regards.",
+      "Sortie au Festival d'Arles en juillet 2026, puis présentée à Annecy, Barcelone et Paris. Chaque titre se découvre comme un récit visuel autonome — un objet sensible à parcourir, collectionner et partager.",
+    ],
+    cover: "/books/working-on-a-dream/card.jpg",
+    gallery: BOOK_CARDS,
   },
 ];

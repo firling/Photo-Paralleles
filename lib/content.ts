@@ -43,9 +43,28 @@ export interface Book {
   availability: Availability;
   /** Placeholder cover: the artist's œuvre image. */
   cover: string;
+  /** Inside spreads / title card shown on the book detail page. */
+  gallery: string[];
   specs: BookSpecs;
   /** Description rendered to HTML from the stored Tiptap document. */
   descriptionHtml: string;
+}
+
+export interface Project {
+  slug: string;
+  title: string;
+  /** Short type label, e.g. "Exposition", "Édition", "Workshop". */
+  kind: string;
+  year: string;
+  location: string;
+  /** Single-sentence introduction. */
+  lead: string;
+  /** Description rendered to HTML from the stored Tiptap document. */
+  descriptionHtml: string;
+  /** Hero / thumbnail image. */
+  cover: string;
+  /** Additional images shown in the project gallery. */
+  gallery: string[];
 }
 
 export const association = {

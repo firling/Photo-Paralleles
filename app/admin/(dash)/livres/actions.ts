@@ -46,6 +46,7 @@ const bookSchema = z.object({
 interface ParsedBook {
   data: z.infer<typeof bookSchema>;
   description: Prisma.InputJsonValue;
+  gallery: Prisma.InputJsonValue;
 }
 
 function parseDescription(raw: string): Prisma.InputJsonValue {
@@ -56,6 +57,18 @@ function parseDescription(raw: string): Prisma.InputJsonValue {
     // fall through to empty doc
   }
   return EMPTY_DOC as Prisma.InputJsonValue;
+}
+
+function parseGallery(raw: string): Prisma.InputJsonValue {
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      return parsed.filter((v): v is string => typeof v === "string");
+    }
+  } catch {
+    // fall through to empty list
+  }
+  return [];
 }
 
 function parseBookForm(
@@ -90,6 +103,7 @@ function parseBookForm(
     value: {
       data: parsed.data,
       description: parseDescription(String(formData.get("description") ?? "")),
+      gallery: parseGallery(String(formData.get("gallery") ?? "")),
     },
   };
 }
@@ -125,7 +139,7 @@ export async function createBookAction(
 
   const parsed = parseBookForm(formData);
   if (!parsed.ok) return { error: parsed.error };
-  const { data, description } = parsed.value;
+  const { data, description, gallery } = parsed.value;
 
   const slugTaken = await prisma.book.findUnique({ where: { slug: data.slug } });
   if (slugTaken) return { error: "Ce slug est déjà utilisé par un autre livre." };
@@ -145,6 +159,7 @@ export async function createBookAction(
       currency: data.currency,
       availability: data.availability,
       cover: data.cover,
+      gallery,
       specs: specsJson(data),
       description,
       order: data.order,
@@ -169,7 +184,7 @@ export async function updateBookAction(
 
   const parsed = parseBookForm(formData);
   if (!parsed.ok) return { error: parsed.error };
-  const { data, description } = parsed.value;
+  const { data, description, gallery } = parsed.value;
 
   const slugTaken = await prisma.book.findFirst({
     where: { slug: data.slug, id: { not: id } },
@@ -192,6 +207,7 @@ export async function updateBookAction(
       currency: data.currency,
       availability: data.availability,
       cover: data.cover,
+      gallery,
       specs: specsJson(data),
       description,
       order: data.order,

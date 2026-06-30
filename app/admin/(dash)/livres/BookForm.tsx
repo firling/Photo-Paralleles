@@ -3,6 +3,7 @@
 import { useState, useActionState } from "react";
 import Link from "next/link";
 import ImageField from "@/components/admin/ImageField";
+import GalleryField from "@/components/admin/GalleryField";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import { slugify } from "@/lib/slug";
 import type { Availability } from "@/lib/content";
@@ -17,6 +18,7 @@ export interface BookFormInitial {
   currency: string;
   availability: Availability;
   cover: string;
+  gallery: string[];
   order: string;
   published: boolean;
   format: string;
@@ -167,6 +169,13 @@ export default function BookForm({
         label="Couverture"
         initialUrl={initial.cover}
         hint="Image envoyée et optimisée (WebP)."
+      />
+
+      <GalleryField
+        name="gallery"
+        label="Galerie (carte-titre & planches)"
+        initialImages={initial.gallery}
+        hint="Vues intérieures affichées sur la fiche : « Feuilleter l'ouvrage »."
       />
 
       <fieldset className="adm-fieldset">

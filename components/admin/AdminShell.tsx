@@ -28,6 +28,7 @@ const MAIN_NAV: NavItem[] = [
 const CATALOG_NAV: NavItem[] = [
   { href: "/admin/livres", label: "Livres" },
   { href: "/admin/artistes", label: "Artistes" },
+  { href: "/admin/projets", label: "Projets" },
 ];
 
 export default function AdminShell({

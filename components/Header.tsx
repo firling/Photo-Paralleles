@@ -7,7 +7,7 @@ import { useCart } from "@/lib/cart";
 
 const NAV_LINKS = [
   { href: "/association", label: "Association" },
-  { href: "/artistes", label: "Artistes" },
+  { href: "/projets", label: "Projets" },
   { href: "/livres", label: "Livres" },
   { href: "/contact", label: "Contact" },
 ];

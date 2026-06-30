@@ -53,12 +53,12 @@ export default async function BookDetailPage({
             {artist && (
               <p style={{ color: "var(--muted)", marginTop: 8 }}>
                 par{" "}
-                <Link
-                  href={`/artistes/${artist.slug}`}
+                <a
+                  href="#auteur"
                   style={{ color: "var(--ink)", borderBottom: "1px solid var(--line)" }}
                 >
                   {artist.name}
-                </Link>
+                </a>
               </p>
             )}
 
@@ -111,6 +111,63 @@ export default async function BookDetailPage({
             />
           </div>
         </div>
+
+        {/* Inside the book — title card + spreads */}
+        {book.gallery.length > 0 && (
+          <section className="book-gallery">
+            <p className="label eyebrow" style={{ marginBottom: 24 }}>
+              Feuilleter l&apos;ouvrage
+            </p>
+            <div className="book-gallery__grid">
+              {book.gallery.map((src, i) => (
+                <figure
+                  key={src}
+                  className={`book-gallery__item${i === 0 ? " book-gallery__item--lead" : ""}`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={src} alt={`${book.title} — vue ${i + 1}`} loading="lazy" />
+                </figure>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* The author — folded in from the former standalone artist page */}
+        {artist && (
+          <section id="auteur" className="book-author">
+            <hr className="rule" style={{ margin: "0 0 clamp(40px,5vw,72px)" }} />
+            <div className="detail">
+              <figure className="detail__photo">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={artist.portrait} alt={`Portrait de ${artist.name}`} />
+              </figure>
+              <div className="detail__bio">
+                <p className="label eyebrow label--accent">
+                  L&apos;auteur · {artist.role}
+                  {artist.baseCity ? ` · ${artist.baseCity}` : ""}
+                </p>
+                <h2 style={{ fontSize: "var(--step-3)", margin: "16px 0 28px" }}>
+                  {artist.name}
+                </h2>
+                <p className="lead">{artist.lead}</p>
+                <div
+                  className="richtext"
+                  dangerouslySetInnerHTML={{ __html: artist.bioHtml }}
+                />
+              </div>
+            </div>
+
+            {artist.oeuvre && (
+              <figure className="work">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={artist.oeuvre} alt={`Œuvre de ${artist.name}`} />
+                <figcaption className="label" style={{ marginTop: 12 }}>
+                  {artist.name} — extrait
+                </figcaption>
+              </figure>
+            )}
+          </section>
+        )}
       </main>
     </>
   );

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces, Jost } from "next/font/google";
+import { Space_Grotesk, Inter } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import UmamiTracker from "@/components/UmamiTracker";
@@ -7,18 +7,18 @@ import { CartProvider } from "@/lib/cart";
 import { association } from "@/lib/content";
 import "./globals.css";
 
-const fraunces = Fraunces({
+// Contemporary editorial pairing: Space Grotesk (display / headings) + Inter
+// (body). Loaded as variable fonts so any weight (incl. the 350 body weight)
+// resolves crisply.
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  weight: ["300", "400", "500"],
-  style: ["normal", "italic"],
-  variable: "--font-fraunces",
+  variable: "--font-display",
   display: "swap",
 });
 
-const jost = Jost({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["300", "400", "500"],
-  variable: "--font-jost",
+  variable: "--font-body",
   display: "swap",
 });
 
@@ -47,7 +47,7 @@ export default function RootLayout({
   const umamiExcludePaths = process.env.UMAMI_EXCLUDE_PATHS;
 
   return (
-    <html lang="fr" className={`${fraunces.variable} ${jost.variable}`}>
+    <html lang="fr" className={`${spaceGrotesk.variable} ${inter.variable}`}>
       <body>
         <CartProvider>
           <Header />

@@ -37,6 +37,9 @@ export default async function EditBookPage({
     currency: book.currency,
     availability: book.availability as Availability,
     cover: book.cover,
+    gallery: Array.isArray(book.gallery)
+      ? (book.gallery.filter((v) => typeof v === "string") as string[])
+      : [],
     order: String(book.order),
     published: book.published,
     format: specs.format ?? "",

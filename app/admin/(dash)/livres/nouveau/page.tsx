@@ -23,6 +23,7 @@ export default async function NewBookPage() {
     currency: "EUR",
     availability: "AVAILABLE",
     cover: "",
+    gallery: [],
     order: String(bookCount),
     published: true,
     format: "Poche · 105 × 152 mm",

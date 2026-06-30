@@ -60,6 +60,7 @@ model Book {
   currency     String       @default("EUR")
   availability Availability @default(AVAILABLE)
   cover        String
+  gallery      Json         @default("[]")
   specs        Json
   description  Json
   order        Int          @default(0)
@@ -69,6 +70,23 @@ model Book {
 
   artistId String @unique
   artist   Artist @relation(fields: [artistId], references: [id])
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  kind        String
+  year        String
+  location    String
+  lead        String
+  description Json
+  cover       String
+  gallery     Json     @default("[]")
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model SiteSetting {
