@@ -78,7 +78,16 @@ async function seedArtists(): Promise<Map<string, string>> {
 }
 
 async function seedBooks(artistIdBySlug: Map<string, string>): Promise<void> {
+  // Books are displayed alphabetically by title (French collation handles the
+  // accents, e.g. « À travers » before « Aria »). Derive each book's `order`
+  // from that ranking rather than the source array order.
+  const orderBySlug = new Map(
+    [...books]
+      .sort((a, b) => a.title.localeCompare(b.title, "fr"))
+      .map((book, rank) => [book.slug, rank] as const),
+  );
   for (const [index, book] of books.entries()) {
+    const order = orderBySlug.get(book.slug) ?? index;
     const artistId = artistIdBySlug.get(book.artistSlug);
     if (!artistId) {
       throw new Error(
@@ -99,7 +108,7 @@ async function seedBooks(artistIdBySlug: Map<string, string>): Promise<void> {
         gallery,
         specs,
         description: asJson(paragraphsToDoc(book.description)),
-        order: index,
+        order,
         artistId,
       },
       update: {
@@ -111,7 +120,7 @@ async function seedBooks(artistIdBySlug: Map<string, string>): Promise<void> {
         gallery,
         specs,
         description: asJson(paragraphsToDoc(book.description)),
-        order: index,
+        order,
         artistId,
       },
     });

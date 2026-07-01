@@ -43,6 +43,10 @@ export interface Book {
   availability: Availability;
   /** Placeholder cover: the artist's œuvre image. */
   cover: string;
+  /** Size of the limited print run — shown publicly ("édition limitée à N ex."). */
+  copiesTotal: number;
+  /** Live stock left. Never shown publicly; drives orderability (0 ⇒ épuisé). */
+  copiesRemaining: number;
   /** Inside spreads / title card shown on the book detail page. */
   gallery: string[];
   specs: BookSpecs;

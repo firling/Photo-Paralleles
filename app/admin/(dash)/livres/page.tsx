@@ -44,6 +44,7 @@ export default async function BooksListPage() {
                 <th>Titre</th>
                 <th>Auteur</th>
                 <th className="adm-num">Prix</th>
+                <th className="adm-num">Stock</th>
                 <th>Disponibilité</th>
                 <th>Publié</th>
                 <th className="adm-num">Ordre</th>
@@ -66,6 +67,13 @@ export default async function BooksListPage() {
                   </td>
                   <td>{book.artist.name}</td>
                   <td className="adm-num">{formatCents(book.priceCents)}</td>
+                  <td className="adm-num">
+                    <span
+                      className={`adm-badge adm-badge--${book.copiesRemaining <= 0 ? "muted" : "ok"}`}
+                    >
+                      {book.copiesRemaining} / {book.copiesTotal}
+                    </span>
+                  </td>
                   <td>
                     <span
                       className={`adm-badge adm-badge--${AVAILABILITY_TONE[book.availability]}`}

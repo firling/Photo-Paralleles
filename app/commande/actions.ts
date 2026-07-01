@@ -97,10 +97,16 @@ export async function createOrder(
         error: `Un article de votre panier n'est plus disponible à la vente.`,
       };
     }
-    if (book.availability !== "AVAILABLE") {
+    if (book.availability !== "AVAILABLE" || book.copiesRemaining <= 0) {
       return {
         ok: false,
         error: `« ${book.title} » n'est plus disponible à la vente (${AVAILABILITY_LABELS[book.availability]}). Merci de le retirer de votre panier.`,
+      };
+    }
+    if (book.copiesRemaining < qty) {
+      return {
+        ok: false,
+        error: `Il ne reste que ${book.copiesRemaining} exemplaire(s) de « ${book.title} ». Merci d'ajuster la quantité.`,
       };
     }
     subtotalCents += book.priceCents * qty;
@@ -127,29 +133,50 @@ export async function createOrder(
     country: data.country,
   };
 
-  // Create the order (+ items) in a transaction, retrying the human reference
-  // on the off chance of a unique collision.
+  // Create the order (+ items) and decrement each book's stock in a single
+  // transaction, retrying the human reference on the off chance of a unique
+  // collision. Stock is decremented with a guarded `updateMany` (only when
+  // enough copies remain) so two concurrent checkouts can never oversell — if
+  // the guard matches 0 rows we roll back with a friendly out-of-stock error.
+  const OUT_OF_STOCK = Symbol("out-of-stock");
   let created;
   for (let attempt = 0; attempt < 5; attempt += 1) {
     const reference = generateReference();
     try {
-      created = await prisma.order.create({
-        data: {
-          reference,
-          status: "EN_ATTENTE",
-          customerName: data.customerName,
-          customerEmail: data.customerEmail,
-          shippingAddress,
-          subtotalCents,
-          shippingCents,
-          totalCents,
-          paymentProvider: null,
-          items: { create: lineItems },
-        },
-        include: { items: true },
+      created = await prisma.$transaction(async (tx) => {
+        for (const line of lineItems) {
+          if (!line.bookId) continue; // custom line without a catalog book
+          const { count } = await tx.book.updateMany({
+            where: { id: line.bookId, copiesRemaining: { gte: line.quantity } },
+            data: { copiesRemaining: { decrement: line.quantity } },
+          });
+          if (count === 0) throw OUT_OF_STOCK;
+        }
+        return tx.order.create({
+          data: {
+            reference,
+            status: "EN_ATTENTE",
+            customerName: data.customerName,
+            customerEmail: data.customerEmail,
+            shippingAddress,
+            subtotalCents,
+            shippingCents,
+            totalCents,
+            paymentProvider: null,
+            items: { create: lineItems },
+          },
+          include: { items: true },
+        });
       });
       break;
     } catch (err) {
+      if (err === OUT_OF_STOCK) {
+        return {
+          ok: false,
+          error:
+            "Un article de votre panier vient d'être épuisé. Merci de vérifier votre panier.",
+        };
+      }
       if (
         err &&
         typeof err === "object" &&

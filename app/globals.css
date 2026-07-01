@@ -19,11 +19,11 @@
   --muted:   #8A847C;
   --accent:  #9C3B2E;
 
-  /* Contemporary editorial pairing. `--serif` keeps its name for backward
-     compatibility but now maps to the Space Grotesk display face; `--sans` maps
-     to Inter for body copy. */
-  --serif: var(--font-display), "Space Grotesk", system-ui, sans-serif;
-  --sans:  var(--font-body), "Inter", system-ui, sans-serif;
+  /* Single geometric-sans family (Manrope) for the whole site — Circular-style
+     typography. `--serif` / `--sans` keep their names for backward compatibility
+     but both now map to Manrope (display + body). */
+  --serif: var(--font-display), "Manrope", system-ui, sans-serif;
+  --sans:  var(--font-display), "Manrope", system-ui, sans-serif;
 
   --maxw: 1280px;
   --gutter: clamp(20px, 5vw, 64px);
@@ -116,7 +116,7 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 400; line-height: 1.05; mar
 .hero { display:grid; grid-template-columns: 1.05fr 0.95fr; gap: clamp(28px,4vw,64px); align-items:center; padding-block: clamp(48px,7vw,96px); }
 .hero__title { font-size: var(--step-4); }
 .hero__title em { font-style: italic; color: var(--accent); }
-.hero__lead { margin-top: 1.6rem; max-width: 46ch; color: var(--ink-soft); font-size: var(--step-1); line-height:1.5; font-family: var(--serif); font-weight:300; }
+.hero__lead { margin-top: 1.6rem; max-width: 46ch; color: var(--ink-soft); font-size: var(--step-1); line-height:1.5; font-family: var(--serif); font-weight:300; text-align: justify; }
 .hero__cta { margin-top: 2.4rem; display:flex; gap: 14px; flex-wrap:wrap; }
 .hero__media { position:relative; }
 .hero__media img { width:100%; aspect-ratio: 4/5; object-fit: cover; }
@@ -131,13 +131,16 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 400; line-height: 1.05; mar
 /* ---- Book cards ---- */
 .books { display:grid; grid-template-columns: repeat(4, 1fr); gap: clamp(18px,2.4vw,34px); }
 .book { display:flex; flex-direction:column; }
-.book__cover { position:relative; aspect-ratio: 105/152; overflow:hidden; background:var(--paper-2); border:1px solid var(--line); }
+/* Covers are the full front+back spread (landscape ≈ 3/2), shown uncropped. */
+.book__cover { position:relative; aspect-ratio: 1600/1079; overflow:hidden; background:var(--paper-2); border:1px solid var(--line); }
 .book__cover img { width:100%; height:100%; object-fit:cover; transition: transform .6s ease; }
 .book:hover .book__cover img { transform: scale(1.03); }
 .book__tag { position:absolute; top:10px; left:10px; background:var(--paper); border:1px solid var(--line); font-size:11px; letter-spacing:.14em; text-transform:uppercase; padding:4px 8px; color:var(--ink-soft); }
-.book__title { font-family:var(--serif); font-size: var(--step-1); margin-top: 16px; }
+.book__title { font-family:var(--serif); font-size: var(--step-1); margin-top: 16px; text-transform: uppercase; }
 .book__author { color: var(--muted); font-size: var(--step--1); margin-top: 4px; letter-spacing:.04em; }
-.book__row { display:flex; align-items:center; justify-content:space-between; margin-top: 14px; }
+/* `margin-top:auto` pins the price + add row to the bottom so it aligns across
+   cards regardless of how many lines the title wraps to. */
+.book__row { display:flex; align-items:center; justify-content:space-between; margin-top: auto; padding-top: 14px; }
 .book__price { font-family:var(--serif); font-size: var(--step-1); }
 .add { font-size: var(--step--1); text-transform:uppercase; letter-spacing:.14em; border:1px solid var(--ink); padding:.6em 1em; transition: all .2s; }
 .add:hover { background:var(--ink); color:var(--paper); }
@@ -188,7 +191,7 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 400; line-height: 1.05; mar
 /* ---- Book detail ---- */
 .product { display:grid; grid-template-columns: 1fr 1fr; gap: clamp(32px,5vw,80px); align-items:start; }
 .product__media { position:sticky; top: 100px; }
-.product__media img { width:100%; aspect-ratio:105/152; object-fit:cover; border:1px solid var(--line); }
+.product__media img { width:100%; aspect-ratio:1600/1079; object-fit:cover; border:1px solid var(--line); }
 .product h1 { font-size: var(--step-2); margin-top: 10px; }
 .product__price { font-family:var(--serif); font-size: var(--step-2); margin: 22px 0; }
 .product__buy { display:flex; gap:14px; align-items:stretch; margin: 22px 0; }

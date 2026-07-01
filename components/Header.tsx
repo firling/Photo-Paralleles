@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
 import { useCart } from "@/lib/cart";
 
 const NAV_LINKS = [
-  { href: "/association", label: "Association" },
+  { href: "/", label: "Association" },
   { href: "/projets", label: "Projets" },
-  { href: "/livres", label: "Livres" },
+  { href: "/livres", label: "Collection 2026" },
   { href: "/contact", label: "Contact" },
 ];
 

@@ -23,6 +23,8 @@ export default async function NewBookPage() {
     currency: "EUR",
     availability: "AVAILABLE",
     cover: "",
+    copiesTotal: "320",
+    copiesRemaining: "320",
     gallery: [],
     order: String(bookCount),
     published: true,

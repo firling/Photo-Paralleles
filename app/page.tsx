@@ -1,25 +1,23 @@
 import Link from "next/link";
-import BookCard from "@/components/BookCard";
-import ArtistCard from "@/components/ArtistCard";
-import ProjectCard from "@/components/ProjectCard";
-import { collection } from "@/lib/content";
-import { getArtist, getArtists, getBooks, getProjects } from "@/lib/queries";
+import type { Metadata } from "next";
+import { association } from "@/lib/content";
+import { getArtist } from "@/lib/queries";
 
-// Catalog is DB-backed and editable from the back-office → render dynamically
-// so edits appear instantly and the build never requires the database.
+// The landing page is the association page: a hero followed by the association
+// presentation. The catalog is DB-backed → render dynamically so the hero œuvre
+// reflects back-office edits and the build never requires the database.
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: { absolute: "Photos Parallèles — L'association" },
+  description: association.tagline,
+};
 
 const HERO_ARTIST_SLUG = "francois-xavier-seren";
 
 export default async function HomePage() {
-  const [heroArtist, books, artists, projects] = await Promise.all([
-    getArtist(HERO_ARTIST_SLUG),
-    getBooks(),
-    getArtists(),
-    getProjects(),
-  ]);
-  const teaserBooks = books.slice(0, 4);
-  const teaserProjects = projects.slice(0, 2);
+  const heroArtist = await getArtist(HERO_ARTIST_SLUG);
+  const [lead, ...rest] = association.presentation;
 
   return (
     <>
@@ -27,7 +25,7 @@ export default async function HomePage() {
       <section className="wrap hero">
         <div className="hero__text">
           <p className="label eyebrow label--accent">
-            Association photographique · depuis 2023
+            Association photographique · depuis {association.foundingYear}
           </p>
           <h1 className="hero__title">
             Quand les regards <em>se répondent</em>
@@ -59,94 +57,24 @@ export default async function HomePage() {
 
       <hr className="rule" />
 
-      {/* COLLECTION */}
+      {/* ASSOCIATION */}
       <section className="wrap section">
         <div className="section-head">
           <div>
-            <p className="label eyebrow">La collection</p>
-            <h2 style={{ marginTop: 14 }}>{collection.name}</h2>
+            <p className="label eyebrow">L&apos;association</p>
+            <h2 style={{ marginTop: 14 }}>
+              Fondée en {association.foundingYear}, {association.location}
+            </h2>
           </div>
-          <p>
-            Huit photographes, huit univers, huit récits visuels singuliers. Des
-            livres au format poche, à découvrir, collectionner et partager.
-          </p>
-          <Link href="/livres">Toute la collection</Link>
+          <p>Par {association.founders.join(" et ")}.</p>
         </div>
 
-        <div className="books">
-          {teaserBooks.map((book) => (
-            <BookCard key={book.slug} book={book} />
+        <div className="prose">
+          <p className="lead">{lead}</p>
+          {rest.map((paragraph, i) => (
+            <p key={i}>{paragraph}</p>
           ))}
         </div>
-      </section>
-
-      {/* ARTISTS */}
-      <section
-        className="section"
-        style={{ background: "var(--paper-2)", borderBlock: "1px solid var(--line)" }}
-      >
-        <div className="wrap">
-          <div className="section-head">
-            <div>
-              <p className="label eyebrow">Les auteurs</p>
-              <h2 style={{ marginTop: 14 }}>Huit regards</h2>
-            </div>
-            <p>
-              Photographes, artistes et créateurs réunis autour d&apos;une même
-              passion pour la narration visuelle.
-            </p>
-            <Link href="/livres">Découvrir leurs livres</Link>
-          </div>
-
-          <div className="artists artists--mini">
-            {artists.map((artist) => (
-              <ArtistCard key={artist.slug} artist={artist} variant="mini" />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* PROJECTS */}
-      {teaserProjects.length > 0 && (
-        <section className="wrap section">
-          <div className="section-head">
-            <div>
-              <p className="label eyebrow">Ce que nous faisons</p>
-              <h2 style={{ marginTop: 14 }}>Nos projets</h2>
-            </div>
-            <p>
-              Expositions, éditions et rencontres — l&apos;association fait
-              dialoguer les images au-delà du livre.
-            </p>
-            <Link href="/projets">Tous les projets</Link>
-          </div>
-
-          <div className="projects">
-            {teaserProjects.map((project) => (
-              <ProjectCard key={project.slug} project={project} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* MANIFESTO */}
-      <section className="wrap section" style={{ textAlign: "center" }}>
-        <p className="label eyebrow" style={{ justifyContent: "center" }}>
-          Notre conviction
-        </p>
-        <p
-          style={{
-            fontFamily: "var(--serif)",
-            fontWeight: 300,
-            fontSize: "var(--step-2)",
-            lineHeight: 1.25,
-            maxWidth: "24ch",
-            margin: "24px auto 0",
-          }}
-        >
-          Chaque image dialogue avec une autre, chaque mémoire en éclaire une
-          seconde.
-        </p>
       </section>
     </>
   );

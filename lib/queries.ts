@@ -54,8 +54,13 @@ function mapBook(row: BookWithArtist): Book {
     artistSlug: row.artist.slug,
     price: row.priceCents / 100,
     currency: row.currency as Currency,
-    availability: row.availability as Availability,
+    // Out of stock ⇒ present as SOLD_OUT so every existing gate (card button,
+    // buy panel, checkout) treats the book as non-orderable without extra logic.
+    availability:
+      row.copiesRemaining <= 0 ? "SOLD_OUT" : (row.availability as Availability),
     cover: row.cover,
+    copiesTotal: row.copiesTotal,
+    copiesRemaining: row.copiesRemaining,
     gallery: toImageList(row.gallery),
     specs: row.specs as unknown as BookSpecs,
     descriptionHtml: renderRichText(row.description),

@@ -18,6 +18,8 @@ export interface BookFormInitial {
   currency: string;
   availability: Availability;
   cover: string;
+  copiesTotal: string;
+  copiesRemaining: string;
   gallery: string[];
   order: string;
   published: boolean;
@@ -163,6 +165,41 @@ export default function BookForm({
           />
         </div>
       </div>
+
+      <fieldset className="adm-fieldset">
+        <legend>Tirage (édition limitée)</legend>
+        <div className="adm-cols">
+          <div className="adm-field">
+            <label htmlFor="copiesTotal">Exemplaires imprimés</label>
+            <input
+              id="copiesTotal"
+              name="copiesTotal"
+              type="number"
+              min="0"
+              step="1"
+              defaultValue={initial.copiesTotal}
+            />
+            <span className="adm-field__hint">
+              Tirage total affiché au public (« édition limitée à N ex. »).
+            </span>
+          </div>
+          <div className="adm-field">
+            <label htmlFor="copiesRemaining">Stock restant</label>
+            <input
+              id="copiesRemaining"
+              name="copiesRemaining"
+              type="number"
+              min="0"
+              step="1"
+              defaultValue={initial.copiesRemaining}
+            />
+            <span className="adm-field__hint">
+              Décrémenté à chaque commande. À 0, le livre n&apos;est plus
+              commandable. Ajustez ici en cas de vente physique.
+            </span>
+          </div>
+        </div>
+      </fieldset>
 
       <ImageField
         name="cover"

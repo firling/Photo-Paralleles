@@ -20,7 +20,9 @@ export default async function ShopPage() {
   return (
     <>
       <div className="wrap page-head">
-        <p className="label eyebrow label--accent">La collection · 8 photographes</p>
+        <p className="label eyebrow label--accent">
+          La collection · 8 livres · 8 photographes
+        </p>
         <h1>{collection.name}</h1>
         <p>
           Huit livres au format poche (105 × 152 mm), 32 pages, couverture souple

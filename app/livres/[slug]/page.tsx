@@ -83,6 +83,10 @@ export default async function BookDetailPage({
 
             <ul className="specs">
               <li>
+                <span>Tirage</span>
+                <span>Édition limitée · {book.copiesTotal} exemplaires</span>
+              </li>
+              <li>
                 <span>Format</span>
                 <span>{book.specs.format}</span>
               </li>

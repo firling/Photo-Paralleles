@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Manrope } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import UmamiTracker from "@/components/UmamiTracker";
@@ -7,18 +7,13 @@ import { CartProvider } from "@/lib/cart";
 import { association } from "@/lib/content";
 import "./globals.css";
 
-// Contemporary editorial pairing: Space Grotesk (display / headings) + Inter
-// (body). Loaded as variable fonts so any weight (incl. the 350 body weight)
-// resolves crisply.
-const spaceGrotesk = Space_Grotesk({
+// Single geometric-sans family for the whole site (headings + body), echoing the
+// Circular-style typography referenced by the client. Manrope is a free variable
+// font, so every weight (incl. the light body weights) resolves crisply. It fills
+// both the display (`--font-display`) and body (`--font-body`) roles.
+const manrope = Manrope({
   subsets: ["latin"],
   variable: "--font-display",
-  display: "swap",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-body",
   display: "swap",
 });
 
@@ -47,7 +42,7 @@ export default function RootLayout({
   const umamiExcludePaths = process.env.UMAMI_EXCLUDE_PATHS;
 
   return (
-    <html lang="fr" className={`${spaceGrotesk.variable} ${inter.variable}`}>
+    <html lang="fr" className={manrope.variable}>
       <body>
         <CartProvider>
           <Header />

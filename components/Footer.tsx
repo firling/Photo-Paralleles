@@ -17,7 +17,7 @@ export default function Footer() {
           </div>
           <div className="fcol">
             <h4>Explorer</h4>
-            <Link href="/association">L&apos;association</Link>
+            <Link href="/">L&apos;association</Link>
             <Link href="/projets">Les projets</Link>
             <Link href="/livres">La collection</Link>
             <Link href="/contact">Contact</Link>

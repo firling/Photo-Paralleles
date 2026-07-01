@@ -61,6 +61,12 @@ model Book {
   availability Availability @default(AVAILABLE)
   cover        String
   gallery      Json         @default("[]")
+  // Print run: `copiesTotal` is the fixed number of copies printed (shown to the
+  // public as "édition limitée à N exemplaires"); `copiesRemaining` is the live
+  // stock, decremented on each order and adjustable from the back-office. When it
+  // reaches 0 the book is no longer orderable. Only the total is exposed publicly.
+  copiesTotal     Int       @default(320)
+  copiesRemaining Int       @default(320)
   specs        Json
   description  Json
   order        Int          @default(0)
