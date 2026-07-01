@@ -18,6 +18,9 @@ const HERO_ARTIST_SLUG = "francois-xavier-seren";
 export default async function HomePage() {
   const heroArtist = await getArtist(HERO_ARTIST_SLUG);
   const [lead, ...rest] = association.presentation;
+  // The closing paragraph reads as a manifesto → set it apart as a pull-quote.
+  const manifesto = rest[rest.length - 1];
+  const body = rest.slice(0, -1);
 
   return (
     <>
@@ -55,25 +58,40 @@ export default async function HomePage() {
         )}
       </section>
 
-      <hr className="rule" />
-
       {/* ASSOCIATION */}
-      <section className="wrap section">
-        <div className="section-head">
-          <div>
-            <p className="label eyebrow">L&apos;association</p>
-            <h2 style={{ marginTop: 14 }}>
-              Fondée en {association.foundingYear}, {association.location}
+      <section className="assoc">
+        <div className="wrap assoc__grid">
+          <aside className="assoc__aside">
+            <p className="label eyebrow label--accent">L&apos;association</p>
+            <h2 className="assoc__title">
+              Un laboratoire d&apos;idées <em>et d&apos;images</em>
             </h2>
-          </div>
-          <p>Par {association.founders.join(" et ")}.</p>
-        </div>
+            <dl className="assoc__facts">
+              <div>
+                <dt>Depuis</dt>
+                <dd>{association.foundingYear}</dd>
+              </div>
+              <div>
+                <dt>Fondateurs</dt>
+                <dd>{association.founders.join(" & ")}</dd>
+              </div>
+              <div>
+                <dt>Ancrage</dt>
+                <dd>{association.location}</dd>
+              </div>
+            </dl>
+            <Link className="btn btn--ghost assoc__cta" href="/contact">
+              Nous écrire
+            </Link>
+          </aside>
 
-        <div className="prose">
-          <p className="lead">{lead}</p>
-          {rest.map((paragraph, i) => (
-            <p key={i}>{paragraph}</p>
-          ))}
+          <div className="assoc__body">
+            <p className="assoc__lead">{lead}</p>
+            {body.map((paragraph, i) => (
+              <p key={i}>{paragraph}</p>
+            ))}
+            <blockquote className="assoc__quote">{manifesto}</blockquote>
+          </div>
         </div>
       </section>
     </>
